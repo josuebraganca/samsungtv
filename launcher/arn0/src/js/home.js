@@ -5,6 +5,7 @@
     var CACHE_KEY = 'arn0.apps.v1';
     var REFRESH_AFTER_MS = 5 * 60 * 1000;
     var GRID_COLS = 5;
+    var GRID_COLS_HOME = 5; // matches #apps-row.grid's column count in css/style.css
 
     var cfg = window.LAUNCHER_CONFIG;
     var log = DevLog.log;
@@ -410,7 +411,7 @@
             startRow: 1,
             hints: [['OK', 'Open'], ['▲', 'Settings']],
             rows: function () {
-                return [[$('gear')], UI.children($('apps-row')), UI.children($('inputs-row'))];
+                return [[$('gear')]].concat(UI.chunk(UI.children($('apps-row')), GRID_COLS_HOME), [UI.children($('inputs-row'))]);
             },
             activate: function (item) {
                 if (item.kind === 'app') launchApp(item);

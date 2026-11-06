@@ -145,7 +145,29 @@ h1, h2 {
 }
 
 #apps-section { top: 350px; }
-#inputs-section { top: 690px; }
+#inputs-section { top: 765px; }
+
+/* Home apps grid: two rows at a glance instead of one scrolling row, so more of the
+   dock is visible without opening All apps. Same column rhythm as the All-apps grid
+   (.grid below), just smaller tiles so two rows plus the Inputs row fit the screen. */
+#apps-row.grid {
+    grid-template-columns: repeat(5, 210px);
+    column-gap: 26px;
+    row-gap: 24px;
+}
+#apps-row.grid .app { width: 210px; margin-right: 0; }
+#apps-row.grid .tile { height: 120px; }
+#apps-row.grid .label { margin-top: 10px; font-size: 19px; }
+#apps-row.grid .wordmark { font-size: 38px; }
+#apps-row.grid .mono { font-size: 42px; }
+#apps-row.grid .all-tile svg { width: 44px; height: 44px; margin: -22px 0 0 -22px; }
+
+/* Inputs row shrunk to match, now that it shares the screen with a taller apps grid. */
+#inputs-row.row-track .input { width: 375px; margin-right: 26px; }
+#inputs-row.row-track .input .tile { height: 133px; padding: 0 28px; }
+#inputs-row.row-track .input .mark { width: 56px; height: 56px; margin-right: 20px; }
+#inputs-row.row-track .input .name { font-size: 24px; }
+#inputs-row.row-track .input .port { font-size: 17px; margin-top: 6px; }
 
 .shelf h2 {
     margin-bottom: 26px;

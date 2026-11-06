@@ -29,6 +29,10 @@
         app('RtveTvApp0.RTVEPlay', 'RTVE Play'),
         app('Atresplay0.atresplayer', 'atresplayer'),
         app('org.tizen.browser', 'Internet'),
+        app('HuluApp000.Hulu', 'Hulu'),
+        app('ParamountP0.ParamountPlus', 'Paramount+'),
+        app('MaxApp00000.Max', 'Max'),
+        app('YtTvApp0000.YouTubeTV', 'YouTube TV'),
         // Noise that the consumer filter should hide
         app('com.samsung.tv.ep-dataservice-app', 'ep-dataservice-app'),
         app('adplatform.ADPlayer', 'ADPlayer'),

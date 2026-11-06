@@ -13,13 +13,18 @@ sideloaded apps, not disable or inspect Samsung's system packages. So:
   risky, not reversible the way you asked for, and not covered here.
 - What *is* real and reversible: Samsung's own privacy toggles (menu-based),
   DNS/router-level ad blocking, and a sideloaded custom launcher
-  ([AeroTizen](https://github.com/helalaou/AeroTizen)) that gives you an
-  app-dock home screen. AeroTizen has its own backup/restore workflow built in.
-- For rotating nature wallpapers, use the Frame's **native Art Mode** +
-  SmartThings "My Photos" slideshow instead of hacking the launcher's
-  background system — it's a first-class supported feature of this exact TV,
-  fully reversible (delete the photos / switch Art Mode off), and more
-  reliable than anything a sideloaded app can do with backgrounds.
+  ([Arn0](https://github.com/NelsonEU/arn0-tv), forked in `launcher/arn0/`)
+  that gives you a clock + app dock + nature-photo background, reversible by
+  uninstalling. Its "Home button takeover" feature was deliberately skipped —
+  it needs a native runner the project doesn't ship, so nothing on the TV's
+  actual Home/startup behavior is touched; you open the launcher from the app
+  list instead.
+- Arn0's own docs say it's confirmed on only one TV (a 2022 Q70B, different
+  Tizen version from yours) — the install itself is low-risk since it's just
+  an app, but if it misbehaves on your firmware,
+  [AeroTizen](https://github.com/helalaou/AeroTizen) (confirmed on your exact
+  2024 Frame LS03D) is the documented fallback, trading the custom photo
+  background for guaranteed compatibility.
 
 Everything here runs from **your own computer**, on the same Wi-Fi as the TV.
 I can't reach your TV or take screenshots from it myself — this cloud session
@@ -31,8 +36,8 @@ screenshots at the checkpoints marked below; I'll check them.
 1. [`docs/01-backup.md`](docs/01-backup.md) — what to back up and how, before touching anything
 2. [`docs/02-ad-telemetry-checklist.md`](docs/02-ad-telemetry-checklist.md) — reversible menu toggles for ads/ACR/voice data
 3. [`pihole/README.md`](pihole/README.md) — optional DNS-level ad/telemetry blocking
-4. [`docs/03-launcher-install.md`](docs/03-launcher-install.md) — sideload AeroTizen, add your dock apps
-5. [`docs/04-art-mode-wallpapers.md`](docs/04-art-mode-wallpapers.md) — rotating nature wallpapers via Art Mode
+4. [`docs/03-launcher-install.md`](docs/03-launcher-install.md) — sideload the launcher (dock apps and wallpaper already configured)
+5. [`docs/04-art-mode-wallpapers.md`](docs/04-art-mode-wallpapers.md) — changing/adding wallpapers
 6. [`docs/05-restore.md`](docs/05-restore.md) — full restore, step by step
 
 Scripts live in `scripts/` and wrap the real `aerotizen` CLI — they're guided

@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-# Restore script: reverts AeroTizen Native Home (if it was ever applied) and
-# optionally uninstalls the launcher. Order matters — restore BEFORE uninstall.
+# FALLBACK ONLY — for the AeroTizen fallback path (see scripts/install.sh).
+# If you installed the primary Arn0 launcher instead, you don't need this:
+# just uninstall it from the TV's app list — see docs/05-restore.md.
+# Reverts AeroTizen Native Home (if it was ever applied) and optionally
+# uninstalls the launcher. Order matters — restore BEFORE uninstall.
 # Run this on your own computer, on the same Wi-Fi as the TV.
 #
 # Usage: ./scripts/restore.sh <TV_IP> [--uninstall]

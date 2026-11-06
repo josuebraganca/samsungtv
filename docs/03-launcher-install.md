@@ -1,100 +1,73 @@
-# 3. Install the AeroTizen home screen + dock
+# 3. Install the launcher
 
-[AeroTizen](https://github.com/helalaou/AeroTizen) (MIT license) is a
-sideloaded Tizen home-screen app. It's been tested on your exact TV family —
-the 2024 Frame LS03D — so this is the best-fit launcher, not a generic Android
-TV tool misapplied to Tizen.
+Using [Arn0](https://github.com/NelsonEU/arn0-tv) (MIT), forked and
+customized in [`launcher/arn0/`](../launcher/arn0/) — see
+[`launcher/README.md`](../launcher/README.md) for exactly what was changed.
 
-Two modes:
-- **Watcher** (default, safer): reopens AeroTizen when you press Home from
-  Samsung Home or Netflix. Doesn't intercept Home from every app (YouTube,
-  Prime, HbbTV apps still go to Samsung Home on Home-press from inside them).
-  No TV-side state is changed beyond installing the app.
-- **Native Home** (opt-in, labeled experimental by the project): rewrites
-  which app Home/power-on actually launches, TV-wide. Confirmed working on a
-  2024 Frame LS03D by the project's own compatibility testing. Fully backed
-  up/restorable via the CLI (that's what `scripts/install.sh` and
-  `scripts/restore.sh` wrap).
+**Honest risk note:** Arn0's own docs say it's "tested on one TV" — a 2022
+Q70B on Tizen 6.5. Yours is a 2024 Frame on Tizen 9.0, a different
+architecture generation. The install itself (this doc) is low-risk —
+it's an ordinary sideloaded app, reversible by uninstalling, and the
+project's own docs describe this half as transferring "to any Tizen TV with
+modest effort." If it doesn't run cleanly on your firmware, fall back to
+AeroTizen instead — see the note at the bottom.
 
-**Start with Watcher mode, live with it a few days, then decide if you want
-Native Home.** Don't jump straight to Native Home.
+**Not attempted: Home-button takeover.** Arn0 has a "Part 2" that reroutes
+the physical Home button, but it needs a custom native runner the project
+doesn't ship — explicitly "source for review, not a ready-to-run procedure"
+per their own docs. Skipping it. You'll open the launcher manually from the
+app list, or use the `Autorun Last App` toggle from
+[`02-ad-telemetry-checklist.md`](02-ad-telemetry-checklist.md) so the TV
+reopens it automatically after you've used it once.
 
-## One-time setup on your computer
+## Already built for you
 
-1. Download the prebuilt CLI from [AeroTizen's Releases page](https://github.com/helalaou/AeroTizen/releases)
-   (Linux x64 / Windows x64 / macOS) — it bundles Python, nothing else to install.
-   Or, if you already have Python 3.10+: `pip install git+https://github.com/helalaou/AeroTizen`
-2. Run [`scripts/install.sh`](../scripts/install.sh) — it walks you through every
-   step below with pauses at the TV-side actions.
+A ready-to-install package is attached separately:
+`launcher/arn0/dist/arn0-launcher.wgt` (not committed to git — gitignored by
+the upstream project's own `.gitignore`, sent to you directly instead).
+You don't need Node.js installed to use it — only to rebuild it after
+further edits.
 
-## What the script does, in order (all real `aerotizen` CLI commands)
+## Install steps
 
-```
-./aerotizen discover
-```
-Finds the TV on your network.
+1. **Developer Mode on the TV**: `Apps` → type `12345` (or `Apps → App
+   Settings` on newer firmware) → Developer mode **On** → set **Host PC IP**
+   to your computer's IP (check all four octets) → unplug the TV 60 seconds,
+   power back on.
 
-**On the TV**: Open **Apps**, type `12345` (remote or on-screen pad — on some
-newer firmware this is under **Apps → App Settings** instead), switch
-**Developer mode** on, set **Host PC IP** to your computer's IP (check all
-four octets before OK). Then unplug the TV for a minute and power back on.
+2. **Install [Apps2Samsung](https://github.com/Apps2Samsung/Apps2Samsung)**
+   on your computer (handles device detection and Samsung certificate
+   signing — simpler than Tizen Studio for a one-off sideload).
 
-```
-./aerotizen status
-```
-Confirms `developerMode=1`.
+3. In Apps2Samsung: connect to your TV's IP, choose **Custom WGT File**,
+   point it at `arn0-launcher.wgt`, install.
 
-```
-./aerotizen certs
-```
-One-time Samsung sign-in in your browser, to sign the app for your TV.
-
-```
-./aerotizen install launcher
-```
-Downloads the latest stable launcher, checks its checksum, signs it, installs it.
+4. Open it from the TV's app list.
 
 ## Checkpoint — screenshot
-Once installed, open AeroTizen from the app list and screenshot the Home tab.
-Send it before adding your dock apps.
+Photograph the TV showing the launcher's Home screen (not a desktop
+preview — the actual panel). Send it over before anything else. I want to
+see: the forest wallpaper, the clock, and whichever of your 8 apps actually
+matched installed apps on your TV.
 
-## Adding your dock apps
-Hold **OK** on a tile → **Add to Home** (or **Move** / **Remove from Home**).
-Add these in order — screenshot the dock after each 2-3 so I can check it's
-building up correctly:
-
-1. Netflix
-2. YouTube
-3. YouTube TV
-4. Prime Video
-5. Disney+
-6. Hulu
-7. Max (HBO Max was renamed "Max" on some Tizen store listings — search both
-   names if you don't see it)
-8. Paramount+
-
-If any aren't preinstalled on your TV, install them from the Samsung app
-store first (`Home > Apps > search`), then add to the dock.
-
-In `Settings → Appearance` within the launcher you can set 3, 4, or 5 apps
-per row — screenshot that menu so I can see your choice.
+## If an app tile is missing
+The dock matches apps by name, so an app that's store-installed under a
+slightly different internal name might not match. Open **All apps** in the
+launcher, find it, note the id shown at the bottom of the screen, then edit
+`launcher/arn0/src/js/config.js` — swap that entry's `match: '...'` for
+`id: '<that exact id>'` — and rebuild (`npm run build`) and reinstall.
 
 ## Checkpoint — screenshot
-Full dock with all 8 apps, plus the Settings → Appearance screen.
+Full dock with all 8 apps resolved. If any didn't resolve after the fix
+above, send a screenshot of **All apps** too so I can see the actual
+installed app names/ids.
 
-## Optional: Native Home (only after you're happy with Watcher mode)
-```
-./aerotizen --tv <TV_IP> home status
-./aerotizen --tv <TV_IP> home backup      # writes ~/.config/aerotizen/backups/<TV>/original-home.json — keep this
-# open AeroTizen on the TV once, to start its control service
-./aerotizen --tv <TV_IP> home apply --yes
-```
-Then power-cycle the TV (unplug 60s) and test Home from YouTube, Prime Video,
-and Samsung Home itself. If Home ever stops behaving, run
-[`scripts/restore.sh`](../scripts/restore.sh) immediately — don't troubleshoot
-further with Native Home active.
-
-Known project caveats, verbatim: "Native Home is experimental," some models
-(e.g. U8092F) fail apply outright, and restore-after-uninstall is "still
-awaiting a controlled physical test" — so always restore *before*
-uninstalling, never after.
+## Fallback: AeroTizen
+If Arn0 fails to install, crashes, or behaves badly on your firmware,
+[AeroTizen](https://github.com/helalaou/AeroTizen) is the safer alternative
+— it's confirmed working on your exact 2024 Frame LS03D model. Trade-off:
+no custom photo background (bundled presets only — Snowfall, Lava), so
+you'd rely on native Art Mode (see
+[`04-art-mode-wallpapers.md`](04-art-mode-wallpapers.md)) for the nature
+photos instead of having them behind the dock. Tell me and I'll write the
+AeroTizen install steps if you need them.

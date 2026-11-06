@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Guided installer for the AeroTizen launcher on the Frame TV.
+# FALLBACK ONLY. The primary launcher (Arn0, see docs/03-launcher-install.md)
+# installs via Developer Mode + Apps2Samsung's GUI — there's no CLI to script.
+# This wraps AeroTizen instead, for if Arn0 fails to install/run on your TV.
 # Run this on your own computer, on the same Wi-Fi as the TV.
 # This is NOT one-shot: it pauses at every step that needs the remote in your hand.
 #

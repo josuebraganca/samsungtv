@@ -8,45 +8,20 @@ Everything here reverses independently — you don't have to undo all of it.
 | TV's manual DNS entry (step 2) | `IP Settings > DNS Setting` → **Obtain automatically** |
 | Pi-hole/AdGuard Home blocklist (step 2b) | Remove the `samsung-ads.txt` adlist entry, re-run Gravity (Pi-hole) |
 | Deleted/disabled Home apps (step 2) | Reinstall from Samsung app store; Samsung TV Plus: Home → highlight it → Down → **Enable** |
-| AeroTizen launcher, Watcher mode (step 3) | `./aerotizen uninstall launcher` |
-| AeroTizen Native Home (step 3, optional) | Run [`scripts/restore.sh`](../scripts/restore.sh) **before** uninstalling — see below |
-| Art Mode photos (step 4) | Delete photos in SmartThings, or toggle Art Mode off |
+| Arn0 launcher (step 3) | Uninstall from the TV's own app list, or via Apps2Samsung. That's it — no Home-button rerouting was done, so there's nothing else to revert |
+| `Autorun Last App`, if you enabled it as the auto-open workaround | `Start Screen Option` → **Autorun Last App** → Off |
 
-## Native Home restore — order matters
-
-If you enabled Native Home, restore it **before** uninstalling the launcher.
-The project's own docs are explicit about this: uninstalling while Home still
-points at AeroTizen leaves the TV in a broken state, and "restore after
-uninstall is still awaiting a controlled physical test."
-
-```
-./scripts/restore.sh
-```
-
-This runs, in order:
-```
-./aerotizen --tv <TV_IP> home restore --yes
-```
-(reverts Home/startup bindings to whatever `home backup` saved — not generic
-Samsung defaults, *your* actual original values)
-then, only if you want the app gone entirely:
-```
-./aerotizen uninstall launcher
-```
-
-Power-cycle the TV (unplug 60s) after `home restore`, then confirm Home
-behaves normally before uninstalling.
-
-## If something goes wrong mid-way
-Don't improvise fixes. Stop, run `./aerotizen --tv <TV_IP> home status`,
-screenshot the output, and send it to me along with what you were doing when
-it went wrong. The backup folder (`~/.config/aerotizen/backups/`) is your
-real safety net — as long as it's intact, this is recoverable.
+## Why this is simpler than it could've been
+We deliberately skipped Arn0's "Home button takeover" feature (see
+[`03-launcher-install.md`](03-launcher-install.md)) — it needs a custom
+native runner the project doesn't ship and that we judged too risky to
+improvise. That means nothing on the TV's actual Home/startup behavior was
+ever touched. Uninstalling the app is the entire restore.
 
 ## Full teardown checklist
-- [ ] `aerotizen home restore --yes` (if Native Home was ever applied)
-- [ ] `aerotizen uninstall launcher`
+- [ ] Uninstall the launcher app (TV app list, or Apps2Samsung)
 - [ ] All step-2 toggles flipped back
 - [ ] DNS set back to automatic (TV and/or Pi-hole)
-- [ ] Art Mode photos removed / Art Mode off
+- [ ] `Autorun Last App` turned back off, if you'd set it
+- [ ] Art Mode photos removed / Art Mode off, if you set that up too
 - [ ] Developer Mode turned back off on the TV (`Apps`, `12345`, toggle off) — not required, but tidy

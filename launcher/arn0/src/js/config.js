@@ -1,0 +1,121 @@
+/*
+ * Home screen content.
+ *
+ * apps: each entry picks the first installed app matching it:
+ *   { id: 'org.tizen.netflix-app' }   exact app id (most reliable; see "All apps", the id of
+ *                                     the focused app is shown at the bottom)
+ *   { match: 'netflix' }              case-insensitive regex on id or name
+ *   label                             optional display name
+ *   brand                             optional key from js/brands.js (otherwise guessed from the name)
+ * Entries that match nothing are skipped.
+ *
+ * inputs: HDMI ports shown in the second row. Set `hdmi` to the port each device is plugged into.
+ */
+window.LAUNCHER_CONFIG = {
+    // Matched by name against whatever's actually installed, so exact app ids aren't needed.
+    // If a tile doesn't show up after install, open All apps, find it, note its id from the
+    // bottom of the screen, and swap the matching entry's `match` for `id: '<that id>'`.
+    apps: [
+        { match: 'netflix', label: 'Netflix', brand: 'netflix' },
+        { match: 'youtube ?tv', label: 'YouTube TV', brand: 'youtubetv' },
+        { match: 'youtube', label: 'YouTube', brand: 'youtube' },
+        { match: 'hulu', label: 'Hulu', brand: 'hulu' },
+        { match: 'disney', label: 'Disney+', brand: 'disneyplus' },
+        { match: 'paramount', label: 'Paramount+', brand: 'paramountplus' },
+        { match: '(^|\\s)max(\\s|$)|hbo', label: 'Max', brand: 'max' },
+        { match: 'prime ?video', label: 'Prime Video', brand: 'primevideo' }
+    ],
+
+    // No HDMI devices configured yet — add your own, e.g.
+    // { hdmi: 1, label: 'PlayStation 5', brand: 'playstation' }.
+    // Available brand keys for consoles: playstation, xbox, switch (see js/brands.js).
+    inputs: [],
+
+    // How an input tile switches the TV. See README "HDMI inputs".
+    //   'switch+viewer'  set the TV source, then open Samsung's TV viewer (default)
+    //   'switch'         only set the TV source
+    //   'inapp'          show the input full screen inside the launcher (Back returns)
+    inputMethod: 'switch+viewer',
+
+    locale: 'en-GB',
+
+    theme: {
+        // Starting wallpaper (key from js/wallpapers.js). Static, not rotating, per request.
+        // Change it anytime from Settings → Background on the TV itself — it remembers the choice,
+        // so this default only matters the very first time the launcher opens.
+        // Other options already bundled: coast, valley-snow, aurora, night-sky, earth, milky-way, kyoto, hills, waterfall.
+        wallpaper: 'forest'
+    },
+
+    /*
+     * Weather shown in the screen saver's corner, from Open-Meteo. No API key and nothing to
+     * keep secret, so this is the whole setup: put your own coordinates here (two decimals is
+     * plenty, and is also about as precise as you want a public request to be). Leave them null
+     * and the widget never appears.
+     *
+     * There is no Settings page for this on purpose — the TV does not move, and coordinates are
+     * not something you type with a remote.
+     */
+    weather: {
+        latitude: null,
+        longitude: null,
+        unit: 'celsius'         // 'celsius' | 'fahrenheit'
+    },
+
+    /*
+     * EXPERIMENTAL navigation sound. Synthesised, so there is no audio file. `move` plays when
+     * focus changes, `edge` when it cannot (the end of a row). Tune by ear in the browser
+     * preview; `volume` is 0–1 and sits on top of the TV's own volume.
+     *
+     * Whether this is worth keeping depends on the TV's audio latency: run
+     * "Sound: report audio latency" in the Lab screen. Set enabled to false to silence it.
+     */
+    sound: {
+        enabled: true,
+        preset: 'soft',
+        volume: 0.08,
+        minGapMs: 45,
+        presets: {
+            soft: { label: 'Soft', freq: 620, ms: 30, type: 'sine' },
+            warm: { label: 'Warm', freq: 520, ms: 44, type: 'triangle' },
+            bright: { label: 'Bright', freq: 1040, ms: 30, type: 'triangle' }
+        },
+        move: { freq: 880, ms: 38, type: 'triangle' },
+        edge: { freq: 200, ms: 70, type: 'sine' },
+        select: { freq: 1320, ms: 55, type: 'triangle' }
+    },
+
+    // Development only: where the Lab screen sends its logs (npm run devlog on your computer).
+    // null disables it; set it to http://<your-computer-ip>:8099/log while debugging.
+    devLogUrl: null
+};
+
+/*
+ * Local overrides from js/config.local.js, which is gitignored and loaded just before this file.
+ * That is where values specific to one TV belong — coordinates, a devlog address — so this file
+ * can stay in the repository with nulls in it. Nothing to strip before a push, nothing to put
+ * back before a build, and the overlay reaches the browser preview and the .wgt alike.
+ *
+ * Merged one level deep, so a local file can set weather.latitude without restating the rest of
+ * the block. Arrays (apps, inputs) and plain values replace the default outright.
+ */
+(function () {
+    'use strict';
+
+    var local = window.LAUNCHER_LOCAL;
+    if (!local) return;
+
+    function plainObject(v) {
+        return v && typeof v === 'object' && !Array.isArray(v);
+    }
+
+    Object.keys(local).forEach(function (key) {
+        if (plainObject(local[key]) && plainObject(window.LAUNCHER_CONFIG[key])) {
+            Object.keys(local[key]).forEach(function (inner) {
+                window.LAUNCHER_CONFIG[key][inner] = local[key][inner];
+            });
+        } else {
+            window.LAUNCHER_CONFIG[key] = local[key];
+        }
+    });
+})();
